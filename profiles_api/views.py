@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework import status
 from profiles_api import serializers
+from rest_framework import viewsets
 
 class HelloApiView(APIView):
     """Test API views"""
@@ -27,7 +28,7 @@ class HelloApiView(APIView):
             return Response({"message:",message})
         else: 
             return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST 
+                            status=status.HTTP_400_BAD_REQUEST
                             )
         
     def put(self,requests, pk=None):
@@ -42,5 +43,46 @@ class HelloApiView(APIView):
         """Delete objects in DB"""
         return Response({'method':'DELETE'})
 
+class HelloViewSet(viewsets.ViewSet):
+    """Test API Viewsets"""
+    
+    serializer_class = serializers.HelloSerializer
 
+    def list(self, request):
+        """Return a Hello message"""
+
+        a_viewset = [
+            'uses actions (list, create, retrieve, update, delete, partial update )'
+        ]
+
+        return Response({"message":"hello", "a_viewset":a_viewset})
+    
+    def create(self, request): 
+        """Create an new name"""
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            name = serializer.validated_data.get('name')
+            message = f'Hello {name}'
+            return Response({"message:",message})
+        else: 
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST
+                            )
+    
+    def retrieve(self, request, pk=None):
+        """Handle getting an object by its ID"""
+
+        return Response({'HTTP_method':'GET'})
+    
+    def update(self, request, pk=None): 
+        """Updates an existing object"""
+        return Response({"HTTP_method":"PUT"})
+
+    def partial_update(self, request, pk=None): 
+        """Partial updates the object"""
+        return Response({"HTTP_Method":"PATCH"})
+    
+    def destroy(self, request, pk=None): 
+        """Handle removing an object"""
+        return Response({"HTTP_Method":"DELETE"})
         
